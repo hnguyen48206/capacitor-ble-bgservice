@@ -62,7 +62,7 @@ value: {"scan_period":5000, "scan_delay":10000}
 
 + Mỗi khi main app cần thay đổi các giá trị key-value trên thì cần gọi stopService trước. Sau khi update thì startService lại.
 
-2. Khi plugin kiểm tra thì sẽ set status on/off lại cho các thiết bị trong list và cập nhật giá trị list mới.
+2. Khi plugin kiểm tra thì sẽ set status on/off lại cho các thiết bị trong list và cập nhật giá trị mới cho key MacBluetoothsConnected.
 
 3. Vấn đề về Permissions:
 
