@@ -45,7 +45,7 @@ stopService() => Promise<void>
 
 ```sh
 
-1. Plugin sẽ dựa vào thông tin key-value sau (trong app storage):
+1. Plugin sẽ dựa vào thông tin các key-value sau (trong app storage) để hoạt động:
 
 key: MacBluetoothsConnected
 value: "[{"mac":"78:02:B7:08:14:51", "vehicleID":"ABC","status":"on"}]"
@@ -54,7 +54,13 @@ value: "[{"mac":"78:02:B7:08:14:51", "vehicleID":"ABC","status":"on"}]"
 + Để tiện cho việc test, nếu service kiểm tra không tìm thấy key này thì sẽ add 1 mảng default
 với 1 thiết bị test có MAC address là 78:02:B7:08:14:51
 + Lưu ý, String giá trị của MAC address luôn viết hoa.
-+ Mỗi khi main app cần thay đổi list này thì cần gọi stopService trước. Sau khi update thì startService lại.
+
+key: BLEConfigs
+value: {"scan_period":5000, "scan_delay":10000}
+
++ Trong đó scan_period là thời gian 1 lần scan và scan_delay là thời gian giữa các lần scan.
+
++ Mỗi khi main app cần thay đổi các giá trị key-value trên thì cần gọi stopService trước. Sau khi update thì startService lại.
 
 2. Khi plugin kiểm tra thì sẽ set status on/off lại cho các thiết bị trong list và cập nhật giá trị list mới.
 
