@@ -61,7 +61,9 @@ a. Android:
    method startService. Main app không cần khai báo Manifest do plugin đã đăng ký sẵn. Nếu plugin check không đủ quyền thì đồng nghĩa service bị cancel.
    + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting. 
   
-b. iOS <IN PROGRESS>
-    + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn Uses Bluetooth LE accessories và Background fetch.
+b. iOS <IN PROGRESS - NOT READY>
+    + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn Uses Bluetooth LE accessories + Background fetch + Background processing
+    + ...
 
+4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). Nhánh bleserv.
 
