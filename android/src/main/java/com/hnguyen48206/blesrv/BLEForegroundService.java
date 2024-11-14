@@ -15,7 +15,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
@@ -72,14 +76,14 @@ public class BLEForegroundService extends Service {
     private String bleconfigsStr;
     private JSONArray listOfDevices;
     private final Handler handler = new Handler();
-    private long SCAN_PERIOD = 5000;
+    private long SCAN_PERIOD = 10000;
     private long DELAY_PERIOD = 10000;
     private final Set<String> detectedDevices = new HashSet<>();
     private final ScanSettings scanSettings = new ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build();
     List<ScanFilter> filters = new ArrayList<>();
-
+    private boolean isTesting = false;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -186,7 +190,9 @@ public class BLEForegroundService extends Service {
                         Log.d(TAG, "SLEEP");
                         Thread.sleep(DELAY_PERIOD);
                         Log.d(TAG, "WAKEUP");
-                        bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+//                        bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+                        bluetoothLeScanner.startScan(scanCallback);
+
                         isScanning = true;
                         Log.d(TAG, "BLE scan started");
                         handler.postDelayed(this, SCAN_PERIOD);
@@ -215,8 +221,11 @@ public class BLEForegroundService extends Service {
             String deviceAddress = result.getDevice().getAddress();
 //            Log.d(TAG, "Device found: " + deviceAddress);
             detectedDevices.add(deviceAddress);
-        }
 
+            //test connecting to device name SCANTOOL
+            if(deviceAddress.equals("78:02:B7:08:14:51") && !isTesting)
+                connectToGATTServer(result.getDevice());
+        }
 
         @Override
         public void onScanFailed(int errorCode) {
@@ -317,4 +326,27 @@ public class BLEForegroundService extends Service {
         notificationManager.notify(1234, notification);
     }
 
+    private void connectToGATTServer(BluetoothDevice device)
+    {
+        Log.d(TAG, "FOUND SCAN TOOL DONGLE 426: " + device.getAddress() + " / " + ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT));
+        isTesting = true;
+        if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "CONNECTING SCAN TOOL DONGLE 426: " + device.getAddress());
+
+            BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        // successfully connected to the GATT Server
+                        Log.d(TAG, "Connected to : " + device.getAddress());
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        // disconnected from the GATT Server
+                        Log.d(TAG, "Disconnected from : " + device.getAddress());
+                    }
+                }
+            };
+
+            BluetoothGatt bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallback);
+        }
+    }
 }
