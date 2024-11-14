@@ -1,1 +1,1 @@
-{"version":3,"file":"definitions.js","sourceRoot":"","sources":["../../src/definitions.ts"],"names":[],"mappings":"","sourcesContent":["export interface BLEServPlugin {\n  echo(options: { value: string }): Promise<{ value: string }>;\n  startService(): Promise<void>;\n  stopService(): Promise<void>;\n}\n"]}
+{"version":3,"file":"definitions.js","sourceRoot":"","sources":["../../src/definitions.ts"],"names":[],"mappings":"","sourcesContent":["export interface BLEServPlugin {\n  startService(): Promise<void>;\n  stopService(): Promise<void>;\n}\n"]}

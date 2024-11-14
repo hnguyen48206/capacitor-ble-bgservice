@@ -1,9 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
 export class BLEServWeb extends WebPlugin {
-    async echo(options) {
-        console.log('ECHO', options);
-        return options;
-    }
     async startService() {
         console.log('Starting BLE checking service...');
         // Implement BLE scanning logic here

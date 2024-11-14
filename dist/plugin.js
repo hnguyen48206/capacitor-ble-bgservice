@@ -6,10 +6,6 @@ var capacitorBLEServ = (function (exports, core) {
     });
 
     class BLEServWeb extends core.WebPlugin {
-        async echo(options) {
-            console.log('ECHO', options);
-            return options;
-        }
         async startService() {
             console.log('Starting BLE checking service...');
             // Implement BLE scanning logic here

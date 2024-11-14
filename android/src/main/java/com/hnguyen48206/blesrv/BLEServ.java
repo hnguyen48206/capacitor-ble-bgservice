@@ -4,10 +4,6 @@ import android.util.Log;
 
 public class BLEServ {
 
-    public String echo(String value) {
-        Log.i("Echo", value);
-        return value;
-    }
 
     public String startService(String value) {
         Log.i("Echo", value);

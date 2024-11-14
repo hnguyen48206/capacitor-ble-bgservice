@@ -11,18 +11,12 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "BLEServPlugin"
     public let jsName = "BLEServ"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startService", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopService", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = BLEServ()
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
-    }
+
 
     @objc func startService(_ call: CAPPluginCall) {
 if bleService == nil {
