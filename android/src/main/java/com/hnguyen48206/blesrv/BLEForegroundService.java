@@ -139,7 +139,7 @@ public class BLEForegroundService extends Service {
 
     private void setDebugDefault() {
         if (devicelistStr.isEmpty())
-            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"vehicleID\":\"ABC\",\"status\":\"on\"}]";
+            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\"}]";
         if (bleconfigsStr.isEmpty()) {
             SCAN_PERIOD = 10000;
             DELAY_PERIOD = 5000;
