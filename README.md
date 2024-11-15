@@ -48,7 +48,7 @@ stopService() => Promise<void>
 1. Plugin sẽ dựa vào thông tin các key-value sau (trong app storage) để hoạt động:
 
 key: MacBluetoothsConnected
-value: "[{"mac":"78:02:B7:08:14:51", "vehicleID":"ABC","status":"on"}]"
+value: "[{"mac":"78:02:B7:08:14:51", "deviceName":"K11", "vehicleID":"ABC","status":"on"}]"
 
 + Trong đó value là 1 mảng các thiết bị cần kiểm tra. List này sẽ do main app set xuống sẵn. 
 + Để tiện cho việc test, nếu service kiểm tra không tìm thấy key này thì sẽ add 1 mảng default
