@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -100,10 +101,13 @@ public class BLEForegroundService extends Service {
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         createNotificationChannel();
+        permissionListFilter();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+//         throw new NullPointerException();
+
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -115,10 +119,12 @@ public class BLEForegroundService extends Service {
                 if (DEBUG) {
                     setDebugDefault();
                 }
+
                 convertDevicelistStrBackToObjectAndBuildFilters();
                 convertBLEconfigsStrBackToObject();
+
                 if (listOfDevices != null) {
-                    startForeground(1, getNotification("BLE Service", "Scanning for Devices."));
+                    startForeground(12345, getNotification("BLE Service", "Scanning for Devices."));
                     startBleScan();
                     saveServiceState(true);
                 } else {
@@ -168,6 +174,25 @@ public class BLEForegroundService extends Service {
             }
     }
 
+    private void permissionListFilter()
+    {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+//            runtimeList = removeString(runtimeList, BLUETOOTH_ADMIN);
+//            runtimeList = removeString(runtimeList, BLUETOOTH);
+        }
+        else
+        {
+            runtimeList = removeString(runtimeList, BLUETOOTH_ADMIN);
+            runtimeList = removeString(runtimeList, BLUETOOTH);
+        }
+    }
+
+    public static String[] removeString(String[] array, String stringToRemove) {
+        return Arrays.stream(array)
+                .filter(s -> !s.equals(stringToRemove))
+                .toArray(String[]::new);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -184,6 +209,7 @@ public class BLEForegroundService extends Service {
     }
 
     private void startBleScan() {
+
         if (!isScanning) {
             handler.post(scanRunnable);
         }
@@ -205,7 +231,10 @@ public class BLEForegroundService extends Service {
         @SuppressLint("MissingPermission")
         @Override
         public void run() {
+            Log.d(TAG, "devicelistStr: " + devicelistStr);
+
             if (checkActivateStatus() && checkPermissions()) {
+
                 if (!isScanning) {
                     detectedDevices.clear();
                     Log.d(TAG, "Starting BLE scan");
@@ -331,6 +360,7 @@ public class BLEForegroundService extends Service {
         int result = 0;
         for (String s : runtimeList) {
             result = ContextCompat.checkSelfPermission(this, s);
+            Log.d(TAG, "permission: " + s + " status " + result);
         }
         return result == 0;
     }
