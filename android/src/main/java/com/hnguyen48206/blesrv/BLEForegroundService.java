@@ -190,8 +190,8 @@ public class BLEForegroundService extends Service {
                         Log.d(TAG, "SLEEP");
                         Thread.sleep(DELAY_PERIOD);
                         Log.d(TAG, "WAKEUP");
-//                        bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
-                        bluetoothLeScanner.startScan(scanCallback);
+                       bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+                        // bluetoothLeScanner.startScan(scanCallback);
 
                         isScanning = true;
                         Log.d(TAG, "BLE scan started");
@@ -223,8 +223,8 @@ public class BLEForegroundService extends Service {
             detectedDevices.add(deviceAddress);
 
             //test connecting to device name SCANTOOL
-            if(deviceAddress.equals("78:02:B7:08:14:51") && !isTesting)
-                connectToGATTServer(result.getDevice());
+            // if(deviceAddress.equals("78:02:B7:08:14:51") && !isTesting)
+            //     connectToGATTServer(result.getDevice());
         }
 
         @Override

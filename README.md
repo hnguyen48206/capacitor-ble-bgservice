@@ -68,8 +68,14 @@ value: {"scan_period":5000, "scan_delay":10000}
 
     a. Android:
     + Hỗ trợ Android OS >= 10
-    + Mặc định, trong plugin sẽ không request các quyền runtime. Do đó, main app cần bảo đảm có đủ quyền trước khi gọi
-    method startService. Main app không cần khai báo Manifest do plugin đã đăng ký sẵn. Nếu plugin check không đủ quyền thì đồng nghĩa service bị cancel.
+    + Mặc định, trong plugin sẽ không request các quyền runtime (danh sách bên dưới). Do đó, main app cần bảo đảm có đủ quyền trước khi gọi method startService. Main app không cần khai báo Manifest do plugin đã đăng ký sẵn. Nếu plugin check không đủ quyền thì đồng nghĩa service bị cancel (có khả năng crash trong bản beta).
+
+        android.permission.BLUETOOTH_SCAN: Required for scanning for Bluetooth devices.
+        android.permission.BLUETOOTH_CONNECT: Required for connecting to Bluetooth devices.
+        android.permission.ACCESS_FINE_LOCATION: Required for accessing precise location.
+        android.permission.ACCESS_COARSE_LOCATION: Required for accessing approximate location.
+        (BLUETOOTH_ADMIN và BLUETOOTH cũng cần cho OS<12)
+
     + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting. 
     
     b. iOS <IN PROGRESS - NOT READY>
