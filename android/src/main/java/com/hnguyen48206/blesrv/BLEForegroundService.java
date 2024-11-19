@@ -25,8 +25,10 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -91,7 +93,7 @@ public class BLEForegroundService extends Service {
     private Context context;
 
     private boolean isTesting = false;
-
+    BluetoothAdapter classic_bluetoothAdapter;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -100,6 +102,9 @@ public class BLEForegroundService extends Service {
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        //normal Bluetooth
+        classic_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         createNotificationChannel();
         permissionListFilter();
     }
@@ -215,10 +220,45 @@ public class BLEForegroundService extends Service {
         }
     }
 
+    private void startClassicScan()
+    {
+        if (classic_bluetoothAdapter != null && classic_bluetoothAdapter.isEnabled()) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                classic_bluetoothAdapter.startDiscovery();
+                BroadcastReceiver receiver = new BroadcastReceiver() {
+                    public void onReceive(Context context, Intent intent) {
+                        String action = intent.getAction();
+                        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                                assert device != null;
+                                String deviceAddress = device.getAddress(); // MAC address
+                                detectedDevices.add(deviceAddress);
+                            }
+
+                        }
+                    }
+                };
+
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                context.registerReceiver(receiver, filter);
+            }
+        }
+    }
+   private void stopClassicScan()
+    {
+        if (classic_bluetoothAdapter != null)
+        {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                classic_bluetoothAdapter.cancelDiscovery();
+            }
+        }
+    }
     private void stopBleScan() {
         if (isScanning) {
             if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
                 bluetoothLeScanner.stopScan(scanCallback);
+                stopClassicScan();
                 isScanning = false;
                 handler.removeCallbacks(scanRunnable);
                 Log.d(TAG, "BLE scan stopped");
@@ -240,10 +280,12 @@ public class BLEForegroundService extends Service {
                     Log.d(TAG, "Starting BLE scan");
 //                    bluetoothLeScanner.startScan(scanCallback);
                     bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+                    startClassicScan();
                     isScanning = true;
                     handler.postDelayed(scanRunnable, SCAN_PERIOD);
                 } else {
                     bluetoothLeScanner.stopScan(scanCallback);
+                    stopClassicScan();
                     isScanning = false;
                     Log.d(TAG, "Stopping BLE scan");
                     updateDeviceStatus();
