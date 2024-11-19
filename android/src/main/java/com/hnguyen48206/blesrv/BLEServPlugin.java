@@ -2,7 +2,6 @@ package com.hnguyen48206.blesrv;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -26,8 +25,15 @@ public class BLEServPlugin extends Plugin {
 
     @PluginMethod
     public void startService(PluginCall call) {
-        Intent intent = new Intent(getContext(), BLEForegroundService.class);
-        getContext().startService(intent);
+//        Intent intent = new Intent(getContext(), BLEForegroundService.class);
+        String activityToStart = "com.innova.tmpdr.BLEForegroundService";
+        try {
+            Class<?> c = Class.forName(activityToStart);
+            Intent intent = new Intent(context, c);
+            context.startActivity(intent);
+        } catch (ClassNotFoundException ignored) {
+        }
+//        getContext().startService(intent);
         call.resolve();
     }
 

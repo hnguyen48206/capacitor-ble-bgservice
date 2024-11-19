@@ -31,11 +31,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service
-            android:name=".BLEForegroundService"
-            android:foregroundServiceType="connectedDevice"
-            tools:ignore="ForegroundServicePermission" />
-
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

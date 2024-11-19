@@ -20,10 +20,15 @@ SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_
 
 if (wasServiceRunning) {
 Log.d(TAG, "Boot completed, starting BLEForegroundService");
-Intent serviceIntent = new Intent(context, BLEForegroundService.class);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        context.startForegroundService(serviceIntent);
-    }
+
+ String activityToStart = "com.innova.tmpdr.BLEForegroundService";
+        try {
+            Class<?> c = Class.forName(activityToStart);
+            Intent serviceIntent = new Intent(context, c);
+            context.startForegroundService(serviceIntent);
+        } catch (ClassNotFoundException ignored) {
+        }
+
 } else {
 Log.d(TAG, "Boot completed, but service was not running before shutdown");
 }
