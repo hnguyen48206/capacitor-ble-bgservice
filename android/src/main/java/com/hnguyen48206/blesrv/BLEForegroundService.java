@@ -234,6 +234,7 @@ public class BLEForegroundService extends Service {
                                 assert device != null;
                                 String deviceAddress = device.getAddress(); // MAC address
                                 detectedDevices.add(deviceAddress);
+                                Log.d(TAG, "Classic BL Device found: " + deviceAddress);
                             }
 
                         }
