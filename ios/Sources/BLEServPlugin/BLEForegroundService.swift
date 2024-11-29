@@ -48,7 +48,7 @@ class BLEForegroundService: NSObject, CBCentralManagerDelegate {
             // Clean up if the task expires
         }
         // Perform your background task here
-        startBleScan(task)
+        startBleScan(task: task)
     }
     func scheduleAppRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: "com.hnguyen48206.blesrv")
