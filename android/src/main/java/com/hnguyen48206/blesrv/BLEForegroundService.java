@@ -341,13 +341,14 @@ public class BLEForegroundService extends Service {
         @SuppressLint("MissingPermission")
         @Override
         public void run() {
-            Log.d(TAG, "devicelistStr: " + devicelistStr);
 
             if (checkActivateStatus() && checkPermissions()) {
 
                 if (!isScanning) {
                     detectedDevices.clear();
                     reloadSharePreferences();
+                    Log.d(TAG, "devicelistStr: " + devicelistStr);
+
                     if(IS_MOVING)
                     {
                     Log.d(TAG, "Starting BLE scan");
@@ -418,9 +419,8 @@ public class BLEForegroundService extends Service {
                 newListOfDevices.put(device);
             }
 
-            listOfDevices = newListOfDevices;
             //save back to storage
-            saveDevicesState();
+            saveDevicesState(newListOfDevices.toString());
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -461,14 +461,13 @@ public class BLEForegroundService extends Service {
         editor.apply();
     }
 
-    private void saveDevicesState() {
+    private void saveDevicesState(String newList) {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        String devicesList = listOfDevices.toString();
-        editor.putString(DEVICE_LIST_KEY, devicesList);
+        editor.putString(DEVICE_LIST_KEY, newList);
         editor.apply();
         if (DEBUG)
-            sendNotification(getNotification("Scan Result", devicesList));
+            sendNotification(getNotification("Scan Result", newList));
     }
 
     private boolean checkActivateStatus() {
