@@ -10,14 +10,17 @@ let package = Package(
             targets: ["BLEServPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "main")
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "main"),
+        .package(url: "https://github.com/PhonePe/BGTasks.git", branch: "main")
     ],
     targets: [
         .target(
             name: "BLEServPlugin",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm")
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
+                .product(name: "BGTasks", package: "BGTasks"),
+
             ],
             path: "ios/Sources/BLEServPlugin"),
         .testTarget(
