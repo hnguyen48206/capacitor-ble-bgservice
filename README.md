@@ -13,8 +13,8 @@ npx cap sync
 
 <docgen-index>
 
-* [`startService()`](#startservice)
-* [`stopService()`](#stopservice)
+- [`startService()`](#startservice)
+- [`stopService()`](#stopservice)
 
 </docgen-index>
 
@@ -27,8 +27,7 @@ npx cap sync
 startService() => Promise<void>
 ```
 
---------------------
-
+---
 
 ### stopService()
 
@@ -36,12 +35,11 @@ startService() => Promise<void>
 stopService() => Promise<void>
 ```
 
---------------------
+---
 
 </docgen-api>
 
-
-## (*) NOTE: các lưu ý khi sử dụng cho nghiệp vụ của walmartApp
+## (\*) NOTE: các lưu ý khi sử dụng cho nghiệp vụ của walmartApp
 
 ```sh
 
@@ -50,7 +48,7 @@ stopService() => Promise<void>
 key: MacBluetoothsConnected
 value: "[{"mac":"78:02:B7:08:14:51", "deviceName":"K11", "vehicleID":"ABC","status":"on"}]"
 
-+ Trong đó value là 1 mảng các thiết bị cần kiểm tra. List này sẽ do main app set xuống sẵn. 
++ Trong đó value là 1 mảng các thiết bị cần kiểm tra. List này sẽ do main app set xuống sẵn.
 + Để tiện cho việc test, nếu service kiểm tra không tìm thấy key này thì sẽ add 1 mảng default
 với 1 thiết bị test có MAC address là 78:02:B7:08:14:51
 + Lưu ý, String giá trị của MAC address luôn viết hoa.
@@ -63,7 +61,7 @@ value: {"scan_period":5000, "scan_delay":10000}
 key: Vehicle_IsMoving
 value: {"Vehicle_IsMoving": true}
 
-+ Trong đó Vehicle_IsMoving là biến có giá trị do main app xác định. Nếu giá trị này false thì plugin sẽ bỏ qua bước scan trong cycle wakeup này. 
++ Trong đó Vehicle_IsMoving là biến có giá trị do main app xác định. Nếu giá trị này false thì plugin sẽ bỏ qua bước scan trong cycle wakeup này.
 
 + Mỗi khi main app cần thay đổi các giá trị key-value trên thì cần gọi stopService trước. Sau khi update thì startService lại.
 
@@ -81,13 +79,13 @@ value: {"Vehicle_IsMoving": true}
         android.permission.ACCESS_COARSE_LOCATION: Required for accessing approximate location.
         (BLUETOOTH_ADMIN và BLUETOOTH cũng cần cho OS<12)
 
-    + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting. 
-    
+    + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting.
+
     b. iOS <BETA>
         + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn Uses Bluetooth LE accessories + Background processing + Act as a BLE accessories
         + Trong info.plist, khai báo các key sau:
 
-            - Required background modes <Array> gồm: 
+            - Required background modes <Array> gồm:
             App communicates using CoreBluetooth
             App processes data in the background
             App shares data using CoreBluetooth
@@ -96,10 +94,10 @@ value: {"Vehicle_IsMoving": true}
             com.hnguyen48206.blesrv
 
             - Privacy - Bluetooth Always Usage Description <String>
-        + Import các files BackgroundTimer.swift và BLEManager.swift vào main App (lưu ý phải dùng tính năng import từ xcode, không phải copy thủ công). Các file này lấy từ git repo của app sample. 
-        + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với repo của app sample. 
+        + Import các files BackgroundTimer.swift và BLEManager.swift vào main App (lưu ý phải dùng tính năng import từ xcode, không phải copy thủ công). Các file này lấy từ git repo của app sample.
+        + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với repo của app sample.
         + Sau khi app đã cài trên thiết bị. Bảo đảm app đã được cấp quyền 'Background App Refresh' trong app settings.
 
-4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app cho iOS). 
+4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app cho iOS).
 
 ```
