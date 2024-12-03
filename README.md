@@ -39,7 +39,7 @@ stopService() => Promise<void>
 
 </docgen-api>
 
-## (\*) NOTE: các lưu ý khi sử dụng cho nghiệp vụ của walmartApp. Lưu ý kéo thanh ngang của git khi tham khảo để không sót nội dung.
+## (\*) NOTE: Lưu ý kéo thanh ngang của git khi tham khảo để không sót nội dung.
 
 ```sh
 
