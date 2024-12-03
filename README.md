@@ -41,7 +41,7 @@ stopService() => Promise<void>
 
 ## (\*) NOTE: các lưu ý khi sử dụng cho nghiệp vụ của walmartApp
 
-```sh
+<code>
 
 1. Plugin sẽ dựa vào thông tin các key-value sau (trong app storage) để hoạt động:
 
@@ -100,4 +100,4 @@ value: {"Vehicle_IsMoving": true}
 
 4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app cho iOS).
 
-```
+</code>
