@@ -56,7 +56,7 @@ với 1 thiết bị test có MAC address là 78:02:B7:08:14:51
 key: BLEConfigs
 value: {"scan_period":5000, "scan_delay":10000}
 
-+ Trong đó scan_period là thời gian 1 lần scan và scan_delay là thời gian giữa các lần scan.
++ Trong đó scan_period là thời gian 1 lần scan và scan_delay là thời gian giữa các lần scan. Đơn vị miliseconds.
 
 key: Vehicle_IsMoving
 value: {"Vehicle_IsMoving": true}
