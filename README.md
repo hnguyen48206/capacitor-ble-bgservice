@@ -63,7 +63,7 @@ value: {"Vehicle_IsMoving": true}
 
 + Trong đó Vehicle_IsMoving là biến có giá trị do main app xác định. Nếu giá trị này false thì plugin sẽ bỏ qua bước scan trong cycle wakeup này.
 
-2. Khi plugin kiểm tra thì sẽ set status on/off lại cho các thiết bị trong list và cập nhật giá trị mới cho key MacBluetoothsConnected.
+2. Khi plugin kiểm tra thì sẽ set status on/off lại cho các thiết bị trong list và cập nhật giá trị mới cho key MacBluetoothsConnected. Mỗi khi main app cần thay đổi các giá trị key-value trên thì cần gọi stopService trước. Sau khi update thì startService lại.
 
 3. Vấn đề về Permissions:
 
