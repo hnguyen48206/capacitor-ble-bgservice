@@ -189,7 +189,7 @@ public class BLEForegroundService extends Service {
 
     private void setDebugDefault() {
         if (devicelistStr.isEmpty())
-            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\",\"isEmptyAutoConnect\":true}]";
+            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\",\"isAutoConnect\":true}]";
 
         if (bleconfigsStr.isEmpty()) {
             SCAN_PERIOD = 15000;
@@ -400,19 +400,27 @@ public class BLEForegroundService extends Service {
             super.onScanFailed(errorCode);
             Log.e(TAG, "BLE scan failed with error code: " + errorCode);
         }
-    }
+    };
 
     private void findDeviceToConnect(ScanResult result)
     {
-        for (int i = 0; i < listOfDevices.length(); i++) {
-            JSONObject device = listOfDevices.getJSONObject(i);
-            String mac = device.getString("mac");
-            if (mac == result.getDevice().getAddress()) {
-                autoConnectDevice = result;
-                Log.e(TAG, "FOUND AUTO CONNECT DEVICE: ");
-                break;
+        try{
+            for (int i = 0; i < listOfDevices.length(); i++) {
+                JSONObject device = listOfDevices.getJSONObject(i);
+                String mac = device.getString("mac");
+                boolean isAutoConnect = device.getBoolean("isAutoConnect");
+                if (mac.equals(result.getDevice().getAddress()) && isAutoConnect) {
+                    autoConnectDevice = result;
+                    Log.e(TAG, "FOUND AUTO CONNECT DEVICE: ");
+                    break;
+                }
             }
         }
+        catch(Throwable e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+
     }
     private void updateDeviceStatus() {
         try {

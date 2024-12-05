@@ -13,8 +13,8 @@ npx cap sync
 
 <docgen-index>
 
-- [`startService()`](#startservice)
-- [`stopService()`](#stopservice)
+* [`startService()`](#startservice)
+* [`stopService()`](#stopservice)
 
 </docgen-index>
 
@@ -27,7 +27,8 @@ npx cap sync
 startService() => Promise<void>
 ```
 
----
+--------------------
+
 
 ### stopService()
 
@@ -35,7 +36,7 @@ startService() => Promise<void>
 stopService() => Promise<void>
 ```
 
----
+--------------------
 
 </docgen-api>
 
