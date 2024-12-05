@@ -6,8 +6,6 @@ import static android.Manifest.permission.BLUETOOTH;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
 import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BLUETOOTH_SCAN;
-import static android.bluetooth.BluetoothProfile.GATT;
-import static android.bluetooth.BluetoothProfile.GATT_SERVER;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -53,8 +51,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -442,12 +438,35 @@ public class BLEForegroundService extends Service {
 
             //save back to storage
             saveDevicesState(newListOfDevices.toString());
+            //push noti
+            pushNotiForTesting(newListOfDevices);
+
         } catch (Throwable e) {
             e.printStackTrace();
         }
 
     }
 
+    private void pushNotiForTesting(JSONArray arr)
+    {
+        if (DEBUG)
+        {
+            try{
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject device = listOfDevices.getJSONObject(i);
+                    device.remove("mac");
+                    device.remove("vehicleID");
+                    device.remove("isAutoConnect");
+                }
+                sendNotification(getNotification("Scan Result", arr.toString()));
+            }
+            catch(Throwable e)
+            {
+                Log.d(TAG, e.getMessage());
+            }
+
+        }
+    }
     private Notification getNotification(String title, String body) {
         Intent notificationIntent = new Intent(this, getClass());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -487,8 +506,6 @@ public class BLEForegroundService extends Service {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(DEVICE_LIST_KEY, newList);
         editor.apply();
-        if (DEBUG)
-            sendNotification(getNotification("Scan Result", newList));
         //auto connect device
         if(autoConnectDevice!=null)
         {
