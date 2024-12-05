@@ -455,7 +455,7 @@ public class BLEForegroundService extends Service {
         {
             try{
                 for (int i = 0; i < arr.length(); i++) {
-                    JSONObject device = listOfDevices.getJSONObject(i);
+                    JSONObject device = arr.getJSONObject(i);
                     device.remove("mac");
                     device.remove("vehicleID");
                     device.remove("isAutoConnect");
