@@ -101,6 +101,7 @@ public class BLEForegroundService extends Service {
 
 
     private BluetoothProfile mProfileProxy;
+    private ScanResult autoConnectDevice;
 
     BluetoothAdapter classic_bluetoothAdapter;
     BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -188,8 +189,8 @@ public class BLEForegroundService extends Service {
 
     private void setDebugDefault() {
         if (devicelistStr.isEmpty())
-            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\"}]";
-        
+            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\",\"isEmptyAutoConnect\":true}]";
+
         if (bleconfigsStr.isEmpty()) {
             SCAN_PERIOD = 15000;
             DELAY_PERIOD = 30000;
@@ -390,9 +391,8 @@ public class BLEForegroundService extends Service {
             }
             detectedDevices.add(deviceAddress);
 
-            //test connecting to device name SCANTOOL
-            // if(deviceAddress.equals("78:02:B7:08:14:51") && !isTesting)
-            //     connectToGATTServer(result.getDevice());
+            // test connecting to device name SCANTOOL
+            findDeviceToConnect(result);
         }
 
         @Override
@@ -400,8 +400,20 @@ public class BLEForegroundService extends Service {
             super.onScanFailed(errorCode);
             Log.e(TAG, "BLE scan failed with error code: " + errorCode);
         }
-    };
+    }
 
+    private void findDeviceToConnect(ScanResult result)
+    {
+        for (int i = 0; i < listOfDevices.length(); i++) {
+            JSONObject device = listOfDevices.getJSONObject(i);
+            String mac = device.getString("mac");
+            if (mac == result.getDevice().getAddress()) {
+                autoConnectDevice = result;
+                Log.e(TAG, "FOUND AUTO CONNECT DEVICE: ");
+                break;
+            }
+        }
+    }
     private void updateDeviceStatus() {
         try {
             JSONArray newListOfDevices = new JSONArray();
@@ -468,6 +480,11 @@ public class BLEForegroundService extends Service {
         editor.apply();
         if (DEBUG)
             sendNotification(getNotification("Scan Result", newList));
+        //auto connect device
+        if(autoConnectDevice!=null)
+        {
+            connectToGATTServer(autoConnectDevice.getDevice());
+        }
     }
 
     private boolean checkActivateStatus() {
@@ -494,10 +511,9 @@ public class BLEForegroundService extends Service {
     }
 
     private void connectToGATTServer(BluetoothDevice device) {
-        Log.d(TAG, "FOUND SCAN TOOL DONGLE 426: " + device.getAddress() + " / " + ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT));
-        isTesting = true;
+//        isTesting = true;
         if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "CONNECTING SCAN TOOL DONGLE 426: " + device.getAddress());
+            Log.d(TAG, "CONNECTING SCAN TOOL DONGLE: " + device.getAddress());
 
             BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
                 @Override
