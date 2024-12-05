@@ -343,7 +343,7 @@ public class BLEForegroundService extends Service {
         @Override
         public void run() {
 
-            if (checkActivateStatus() && checkPermissions()) {
+            if (checkActivateStatus() && checkPermissions() && classic_bluetoothAdapter.isEnabled()) {
 
                 if (!isScanning) {
                     detectedDevices.clear();
@@ -375,6 +375,7 @@ public class BLEForegroundService extends Service {
                 }
             } else {
                 stopBleScan();
+                handler.postDelayed(scanRunnable, DELAY_PERIOD);
                 // stopSelf();
             }
         }
