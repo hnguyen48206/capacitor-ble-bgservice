@@ -97,7 +97,7 @@ public class BLEForegroundService extends Service {
 
 
     private BluetoothProfile mProfileProxy;
-    private ScanResult autoConnectDevice;
+    private BluetoothDevice autoConnectDevice;
 
     BluetoothAdapter classic_bluetoothAdapter;
     BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -110,6 +110,7 @@ public class BLEForegroundService extends Service {
                     String deviceAddress = device.getAddress(); // MAC address
                     detectedDevices.add(deviceAddress);
                     Log.d(TAG, "Classic BL Device found: " + deviceAddress + "/" + device.getName());
+                    findDeviceToConnect(device);
                 }
 
             }
@@ -323,6 +324,7 @@ public class BLEForegroundService extends Service {
                     String address = device.getAddress();
                     Log.d(TAG, "Current Connected Device: " + address);
                     detectedDevices.add(address);
+                    findDeviceToConnect(device);
                 }
             } else {
                 Log.d(TAG, "getCurrentConnectedList: null mProfileProxy");
@@ -389,7 +391,7 @@ public class BLEForegroundService extends Service {
             detectedDevices.add(deviceAddress);
 
             // test connecting to device name SCANTOOL
-            findDeviceToConnect(result);
+            findDeviceToConnect(result.getDevice());
         }
 
         @Override
@@ -399,15 +401,15 @@ public class BLEForegroundService extends Service {
         }
     };
 
-    private void findDeviceToConnect(ScanResult result)
+    private void findDeviceToConnect(BluetoothDevice mDevice)
     {
         try{
             for (int i = 0; i < listOfDevices.length(); i++) {
                 JSONObject device = listOfDevices.getJSONObject(i);
                 String mac = device.getString("mac");
                 boolean isAutoConnect = device.getBoolean("isAutoConnect");
-                if (mac.equals(result.getDevice().getAddress()) && isAutoConnect) {
-                    autoConnectDevice = result;
+                if (mac.equals(mDevice.getAddress()) && isAutoConnect) {
+                    autoConnectDevice = mDevice;
                     Log.e(TAG, "FOUND AUTO CONNECT DEVICE: ");
                     break;
                 }
@@ -509,7 +511,7 @@ public class BLEForegroundService extends Service {
         //auto connect device
         if(autoConnectDevice!=null)
         {
-            connectToGATTServer(autoConnectDevice.getDevice());
+            connectToGATTServer(autoConnectDevice);
         }
     }
 
