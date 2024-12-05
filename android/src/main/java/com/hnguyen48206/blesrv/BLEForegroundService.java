@@ -354,8 +354,8 @@ public class BLEForegroundService extends Service {
                     //current connected devices
                     getCurrentConnectedList();
                     //ble devices
-                    bluetoothLeScanner.startScan(scanCallback);
-//                    bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+                    //bluetoothLeScanner.startScan(scanCallback);
+                    bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
                     //classic devices
                     startClassicScan();
                     isScanning = true;
