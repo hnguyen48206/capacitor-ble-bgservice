@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+
 @CapacitorPlugin(name = "BLEServ")
 public class BLEServPlugin extends Plugin {
     private static final String PREFS_NAME = "CapacitorStorage";
