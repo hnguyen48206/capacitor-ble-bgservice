@@ -140,7 +140,7 @@ public class BLEForegroundService extends Service {
             @Override
             public void onServiceDisconnected(int profile) {
             }
-        }, BluetoothProfile.HEADSET);
+        }, BluetoothProfile.GATT);
     }
 
     public void reloadSharePreferences() {
@@ -314,7 +314,6 @@ public class BLEForegroundService extends Service {
     {
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-            detectedDevices.clear();
             if (mProfileProxy != null) {
                 List<BluetoothDevice> connectedDevices = mProfileProxy.getConnectedDevices();
                 printLog("Current Headset List Connected Device: " + connectedDevices.toString());
