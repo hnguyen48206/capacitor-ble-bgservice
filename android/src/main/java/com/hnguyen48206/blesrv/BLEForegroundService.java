@@ -441,7 +441,7 @@ public class BLEForegroundService extends Service {
             //save back to storage
             saveDevicesState(newListOfDevices.toString());
             //push noti
-            pushNotiForTesting(newListOfDevices);
+            // pushNotiForTesting(newListOfDevices);
 
         } catch (Throwable e) {
             e.printStackTrace();
