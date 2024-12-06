@@ -100,7 +100,7 @@ value: {"Vehicle_IsMoving": true}
 4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app cho iOS).
 
 5. <IOS-BLE with GPS> Bản thử nghiệm sử dụng thêm corelocation để tăng survivability 
-Với bản này, sử dụng src ở nhánh sample: ==bleserv-in-app-gps==
+Với bản này, sử dụng src ở nhánh sample: bleserv-in-app-gps
 
 Bổ sung các quyền sau trong info.plist
     - Required background modes <Array>
