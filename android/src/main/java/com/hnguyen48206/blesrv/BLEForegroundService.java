@@ -66,7 +66,7 @@ public class BLEForegroundService extends Service {
             BLUETOOTH_ADMIN
     };
     private static final Boolean DEBUG = true;
-    private final boolean isTesting = true;
+    private boolean isTesting = true;
 
     private static final String TAG = "BLEForegroundService";
     private static final String CHANNEL_ID = "BLEForegroundServiceChannel";
@@ -220,6 +220,7 @@ public class BLEForegroundService extends Service {
                 JSONObject jsonObject = new JSONObject(bleconfigsStr);
                 SCAN_PERIOD = jsonObject.getLong("scan_period");
                 DELAY_PERIOD = jsonObject.getLong("scan_delay");
+                isTesting = jsonObject.getBoolean("isTesting");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -552,24 +553,29 @@ public class BLEForegroundService extends Service {
 
     private void connectToGATTServer(BluetoothDevice device) {
 //        isTesting = true;
-        if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-            printLog("CONNECTING SCAN TOOL DONGLE: " + device.getAddress());
+        if(!isDeviceConnected(device))
+        {
+            if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                printLog("CONNECTING SCAN TOOL DONGLE: " + device.getAddress());
 
-            BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
-                @Override
-                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                    if (newState == BluetoothProfile.STATE_CONNECTED) {
-                        // successfully connected to the GATT Server
-                        printLog("Connected to : " + device.getAddress());
-                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                        // disconnected from the GATT Server
-                        printLog("Disconnected from : " + device.getAddress());
+                BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                        if (newState == BluetoothProfile.STATE_CONNECTED) {
+                            // successfully connected to the GATT Server
+                            printLog("Connected to : " + device.getAddress());
+                        } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                            // disconnected from the GATT Server
+                            printLog("Disconnected from : " + device.getAddress());
+                        }
                     }
-                }
-            };
+                };
 
-            autoConnectDeviceGatt = device.connectGatt(this, false, bluetoothGattCallback);
+                autoConnectDeviceGatt = device.connectGatt(this, false, bluetoothGattCallback);
+            }
         }
+        else
+            printLog("Device is already in connection : " + device.getAddress() + " " + device.getName());
     }
 
     private void printLog(String msg)
