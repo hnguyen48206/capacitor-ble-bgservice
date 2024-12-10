@@ -55,9 +55,10 @@ với 1 thiết bị test có MAC address là 78:02:B7:08:14:51
 + Lưu ý, String giá trị của MAC address luôn viết hoa.
 
 key: BLEConfigs
-value: {"scan_period":5000, "scan_delay":10000, "isTesting": true}
+value: {"scan_period":5000, "scan_delay":10000, "isTesting": true, "connect_delay":900000}
 
-+ Trong đó scan_period là thời gian 1 lần scan và scan_delay là thời gian giữa các lần scan. Đơn vị miliseconds. isTesting là cờ bật/tắt log console ở native.
++ Trong đó scan_period là thời gian 1 lần scan và scan_delay là thời gian giữa các lần scan. Đơn vị miliseconds. isTesting là cờ bật/tắt log console ở native. connect_delay là key set thời gian delay việc connect đến thiết bị
+sau khi đã phát hiện ra trạng thái 'on'
 
 key: Vehicle_IsMoving
 value: {"Vehicle_IsMoving": true}
@@ -97,7 +98,7 @@ value: {"Vehicle_IsMoving": true}
         + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với repo của app sample.
         + Sau khi app đã cài trên thiết bị. Bảo đảm app đã được cấp quyền 'Background App Refresh' trong app settings.
 
-4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app cho iOS).
+4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app-gps cho iOS).
 
 5. <IOS-BLE with GPS> Bản thử nghiệm sử dụng thêm corelocation để tăng survivability 
 Với bản này, sử dụng src ở nhánh sample: bleserv-in-app-gps
@@ -112,4 +113,9 @@ Bổ sung các quyền sau trong info.plist
     - Privacy - Location When In Use Usage Description
 
 Bổ sung vào Capabilities --> Background Mode --> Location Update
+
+6. <IOS only> Scan Log History:
+Plugin sẽ lưu lại lịch sử các lần scan thành công vào localstorage của ứng dụng với key "scanHistoryLog"
+Sau khi main app get lên thì có thể parse giá trị string thành array để hiển thị, tham khảo nhánh bleserv-in-app-gps
+của app sample.
 ```
