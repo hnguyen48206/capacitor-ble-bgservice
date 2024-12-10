@@ -82,39 +82,32 @@ value: {"Vehicle_IsMoving": true}
     + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting.
 
     b. iOS <BETA>
-        + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn Uses Bluetooth LE accessories + Background processing + Act as a BLE accessories
+        + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn 
+        Uses Bluetooth LE accessories + Background processing + Act as a BLE accessories + Location Update + Background fetch
         + Trong info.plist, khai báo các key sau:
 
             - Required background modes <Array> gồm:
             App communicates using CoreBluetooth
             App processes data in the background
             App shares data using CoreBluetooth
+            App registers for location updates
 
             - Permitted background task scheduler identifiers <Array> gồm:
             com.hnguyen48206.blesrv
 
-            - Privacy - Bluetooth Always Usage Description <String>
+            - Privacy - Bluetooth Always Usage Description
+            - Privacy - Bluetooth Peripheral Usage Description
+            - Privacy - Location Always Usage Description
+            - Privacy - Location Always and When In Use Usage Description
+            - Privacy - Location When In Use Usage Description
+
         + Import các files BackgroundTimer.swift và BLEManager.swift vào main App (lưu ý phải dùng tính năng import từ xcode, không phải copy thủ công). Các file này lấy từ git repo của app sample.
         + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với repo của app sample.
         + Sau khi app đã cài trên thiết bị. Bảo đảm app đã được cấp quyền 'Background App Refresh' trong app settings.
 
 4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app-gps cho iOS).
 
-5. <IOS-BLE with GPS> Bản thử nghiệm sử dụng thêm corelocation để tăng survivability 
-Với bản này, sử dụng src ở nhánh sample: bleserv-in-app-gps
-
-Bổ sung các quyền sau trong info.plist
-    - Required background modes <Array>
-    App registers for location updates
-
-    - Privacy - Bluetooth Peripheral Usage Description
-    - Privacy - Location Always Usage Description
-    - Privacy - Location Always and When In Use Usage Description
-    - Privacy - Location When In Use Usage Description
-
-Bổ sung vào Capabilities --> Background Mode --> Location Update
-
-6. <IOS only> Scan Log History:
+5. <IOS only> Scan Log History:
 Plugin sẽ lưu lại lịch sử các lần scan thành công vào localstorage của ứng dụng với key "scanHistoryLog"
 Sau khi main app get lên thì có thể parse giá trị string thành array để hiển thị, tham khảo nhánh bleserv-in-app-gps
 của app sample.
