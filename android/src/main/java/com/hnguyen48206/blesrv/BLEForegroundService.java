@@ -358,7 +358,7 @@ public class BLEForegroundService extends Service {
                     reloadSharePreferences();
                     printLog("devicelistStr: " + devicelistStr);
 
-                    if(IS_MOVING)
+                    if(IS_MOVING || (autoConnectDevice!=null && isDeviceConnected(autoConnectDevice)))
                     {
                     printLog("Starting BLE scan");
                     //current connected devices
@@ -372,7 +372,7 @@ public class BLEForegroundService extends Service {
                     handler.postDelayed(scanRunnable, SCAN_PERIOD);
                     }
                     else
-                        printLog("WONT start BLE scan due to no moving status.");
+                        printLog("WONT start BLE scan due to no moving status or the target device is already in connection.");
                 } else {
                     bluetoothLeScanner.stopScan(scanCallback);
                     stopClassicScan();
