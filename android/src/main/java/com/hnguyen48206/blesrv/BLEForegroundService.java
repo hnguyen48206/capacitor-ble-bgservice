@@ -47,8 +47,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,6 +77,7 @@ public class BLEForegroundService extends Service {
     private static final String DEVICE_LIST_KEY = "MacBluetoothsConnected";
     private static final String BLE_CONFIG_KEY = "BLEConfigs";
     private static final String IS_MOVING_CONFIG = "Vehicle_IsMoving";
+    private static final String BLE_SCANLOG_KEY = "scanHistoryLog";
 
     private BluetoothLeScanner bluetoothLeScanner;
     private boolean isScanning = false;
@@ -87,6 +90,7 @@ public class BLEForegroundService extends Service {
     private long DELAY_PERIOD = 0;
     private long SCAN_MODE = 1111;
     private boolean IS_MOVING = false;
+    private long connect_delay = 900000;
     private final Set<String> detectedDevices = new HashSet<>();
     private final ScanSettings scanSettings = new ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -221,6 +225,7 @@ public class BLEForegroundService extends Service {
                 SCAN_PERIOD = jsonObject.getLong("scan_period");
                 DELAY_PERIOD = jsonObject.getLong("scan_delay");
                 isTesting = jsonObject.getBoolean("isTesting");
+                connect_delay = jsonObject.getLong("connect_delay");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -520,6 +525,8 @@ public class BLEForegroundService extends Service {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(DEVICE_LIST_KEY, newList);
+        editor.putString(BLE_SCANLOG_KEY, new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + "_" + newList);
+
         editor.apply();
         //auto connect device
         if(autoConnectDevice!=null)
