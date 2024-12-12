@@ -33,6 +33,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.content.SharedPreferences;
 
@@ -68,7 +69,7 @@ public class BLEForegroundService extends Service {
             BLUETOOTH_ADMIN
     };
     private static final Boolean DEBUG = true;
-    private boolean isTesting = false;
+    private boolean isTesting = true;
 
     private static final String TAG = "BLEForegroundService";
     private static final String CHANNEL_ID = "BLEForegroundServiceChannel";
@@ -88,7 +89,6 @@ public class BLEForegroundService extends Service {
     private final Handler handler = new Handler();
     private long SCAN_PERIOD = 0;
     private long DELAY_PERIOD = 0;
-    private long SCAN_MODE = 1111;
     private boolean IS_MOVING = false;
     private long connect_delay = 900000;
     private final Set<String> detectedDevices = new HashSet<>();
@@ -99,7 +99,7 @@ public class BLEForegroundService extends Service {
 
     private ExecutorService executorService;
     private Context context;
-
+    private List<String> historyList = new ArrayList<String>();
 
     private BluetoothProfile mProfileProxy;
     private BluetoothDevice autoConnectDevice;
@@ -122,6 +122,7 @@ public class BLEForegroundService extends Service {
             }
         }
     };
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -154,6 +155,7 @@ public class BLEForegroundService extends Service {
         devicelistStr = prefs.getString(DEVICE_LIST_KEY, "");
         bleconfigsStr = prefs.getString(BLE_CONFIG_KEY, "");
         isMovingStr = prefs.getString(IS_MOVING_CONFIG, "");
+        historyList = new ArrayList<>(Arrays.asList(prefs.getString(BLE_SCANLOG_KEY, "").split("devider")));
 
         if (DEBUG) {
             setDebugDefault();
@@ -194,10 +196,10 @@ public class BLEForegroundService extends Service {
             devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\",\"isAutoConnect\":true}]";
 
         if (bleconfigsStr.isEmpty()) {
-            SCAN_PERIOD = 15000;
-            DELAY_PERIOD = 30000;
+            SCAN_PERIOD = 10000;
+            DELAY_PERIOD = 50000;
         }
-        if(isMovingStr.isEmpty())
+        if (isMovingStr.isEmpty())
             IS_MOVING = true;
     }
 
@@ -231,7 +233,7 @@ public class BLEForegroundService extends Service {
             }
     }
 
-     private void convertIsMovingStrBackToObject() {
+    private void convertIsMovingStrBackToObject() {
         if (isMovingStr != "")
             try {
                 JSONObject jsonObject = new JSONObject(isMovingStr);
@@ -242,14 +244,11 @@ public class BLEForegroundService extends Service {
     }
 
 
-    private void permissionListFilter()
-    {
+    private void permissionListFilter() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
 //            runtimeList = removeString(runtimeList, BLUETOOTH_ADMIN);
 //            runtimeList = removeString(runtimeList, BLUETOOTH);
-        }
-        else
-        {
+        } else {
             runtimeList = removeString(runtimeList, BLUETOOTH_ADMIN);
             runtimeList = removeString(runtimeList, BLUETOOTH);
         }
@@ -283,8 +282,7 @@ public class BLEForegroundService extends Service {
         }
     }
 
-    private void startClassicScan()
-    {
+    private void startClassicScan() {
         printLog("Classic BL Scanner Status: " + classic_bluetoothAdapter.isEnabled());
 
         if (classic_bluetoothAdapter != null && classic_bluetoothAdapter.isEnabled()) {
@@ -297,15 +295,15 @@ public class BLEForegroundService extends Service {
             }
         }
     }
-   private void stopClassicScan()
-    {
-        if (classic_bluetoothAdapter != null)
-        {
+
+    private void stopClassicScan() {
+        if (classic_bluetoothAdapter != null) {
             if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
                 classic_bluetoothAdapter.cancelDiscovery();
             }
         }
     }
+
     private void stopBleScan() {
         if (isScanning) {
             if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
@@ -318,8 +316,7 @@ public class BLEForegroundService extends Service {
         }
     }
 
-    private void getCurrentConnectedList()
-    {
+    private void getCurrentConnectedList() {
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             if (mProfileProxy != null) {
@@ -333,8 +330,7 @@ public class BLEForegroundService extends Service {
                 }
 
                 Set<BluetoothDevice> pairedDevices = classic_bluetoothAdapter.getBondedDevices();
-                for (BluetoothDevice device : pairedDevices)
-                {
+                for (BluetoothDevice device : pairedDevices) {
                     String address = device.getAddress();
                     printLog("Current Connected Device: " + address);
                     detectedDevices.add(address);
@@ -363,21 +359,22 @@ public class BLEForegroundService extends Service {
                     reloadSharePreferences();
                     printLog("devicelistStr: " + devicelistStr);
 
-                    if(IS_MOVING || (autoConnectDevice!=null && isDeviceConnected(autoConnectDevice)))
-                    {
-                    printLog("Starting BLE scan");
-                    //current connected devices
-                    getCurrentConnectedList();
-                    //ble devices
-//                    bluetoothLeScanner.startScan(scanCallback);
-                    bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
-                    //classic devices
-                    startClassicScan();
-                    isScanning = true;
-                    handler.postDelayed(scanRunnable, SCAN_PERIOD);
+                    if (IS_MOVING || (autoConnectDevice != null && isDeviceConnected(autoConnectDevice))) {
+                        printLog("Starting BLE scan");
+                        //current connected devices
+                        getCurrentConnectedList();
+                        //ble devices
+                        //bluetoothLeScanner.startScan(scanCallback);
+                        bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
+                        //classic devices
+                        startClassicScan();
+                        isScanning = true;
+                        handler.postDelayed(scanRunnable, SCAN_PERIOD);
+                    } else {
+                        var msg = "WONT start BLE scan due to ISMOVING status false or the target device is already in connection.";
+                        addHistory(msg);
+                        printLog(msg);
                     }
-                    else
-                        printLog("WONT start BLE scan due to no moving status or the target device is already in connection.");
                 } else {
                     bluetoothLeScanner.stopScan(scanCallback);
                     stopClassicScan();
@@ -387,6 +384,9 @@ public class BLEForegroundService extends Service {
                     handler.postDelayed(scanRunnable, DELAY_PERIOD);
                 }
             } else {
+                var msg = "WONT start BLE scan because Method Start has not triggered yet OR Lacking of Permission OR Bluetooth is off";
+                addHistory(msg);
+                printLog(msg);
                 stopBleScan();
                 handler.postDelayed(scanRunnable, DELAY_PERIOD);
                 // stopSelf();
@@ -416,9 +416,8 @@ public class BLEForegroundService extends Service {
         }
     };
 
-    private void findDeviceToConnect(BluetoothDevice mDevice)
-    {
-        try{
+    private void findDeviceToConnect(BluetoothDevice mDevice) {
+        try {
             for (int i = 0; i < listOfDevices.length(); i++) {
                 JSONObject device = listOfDevices.getJSONObject(i);
                 String mac = device.getString("mac");
@@ -429,13 +428,12 @@ public class BLEForegroundService extends Service {
                     break;
                 }
             }
-        }
-        catch(Throwable e)
-        {
+        } catch (Throwable e) {
             printLog(e.getMessage());
         }
 
     }
+
     private void updateDeviceStatus() {
         try {
             JSONArray newListOfDevices = new JSONArray();
@@ -444,7 +442,7 @@ public class BLEForegroundService extends Service {
                 JSONObject device = listOfDevices.getJSONObject(i);
                 String mac = device.getString("mac");
                 if (ActivityCompat.checkSelfPermission(context, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                    if (detectedDevices.contains(mac) || (autoConnectDevice!=null && autoConnectDevice.getAddress().equals(mac) && isDeviceConnected(autoConnectDevice))) {
+                    if (detectedDevices.contains(mac) || (autoConnectDevice != null && autoConnectDevice.getAddress().equals(mac) && isDeviceConnected(autoConnectDevice))) {
                         printLog("Known device is online: " + mac);
                         device.put("status", "on");
                     } else {
@@ -467,11 +465,9 @@ public class BLEForegroundService extends Service {
 
     }
 
-    private void pushNotiForTesting(JSONArray arr)
-    {
-        if (DEBUG && isTesting)
-        {
-            try{
+    private void pushNotiForTesting(JSONArray arr) {
+        if (DEBUG && isTesting) {
+            try {
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject device = arr.getJSONObject(i);
                     device.remove("mac");
@@ -479,14 +475,13 @@ public class BLEForegroundService extends Service {
                     device.remove("isAutoConnect");
                 }
                 sendNotification(getNotification("Scan Result", arr.toString()));
-            }
-            catch(Throwable e)
-            {
+            } catch (Throwable e) {
                 printLog(e.getMessage());
             }
 
         }
     }
+
     private Notification getNotification(String title, String body) {
         Intent notificationIntent = new Intent(this, getClass());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -525,14 +520,21 @@ public class BLEForegroundService extends Service {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(DEVICE_LIST_KEY, newList);
-        editor.putString(BLE_SCANLOG_KEY, new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + "_" + newList);
+        addHistory(newList);
+        editor.putString(BLE_SCANLOG_KEY, TextUtils.join("devider", historyList));
 
         editor.apply();
         //auto connect device
-        if(autoConnectDevice!=null)
-        {
-            connectToGATTServer(autoConnectDevice);
-        }
+//        if(autoConnectDevice!=null)
+//        {
+//            connectToGATTServer(autoConnectDevice);
+//        }
+    }
+
+    private void addHistory(String log_msg) {
+        if (historyList.size() > 200)
+            historyList.remove(0);
+        historyList.add(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + "_" + log_msg);
     }
 
     private boolean checkActivateStatus() {
@@ -560,8 +562,7 @@ public class BLEForegroundService extends Service {
 
     private void connectToGATTServer(BluetoothDevice device) {
 //        isTesting = true;
-        if(!isDeviceConnected(device))
-        {
+        if (!isDeviceConnected(device)) {
             if (ActivityCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
                 printLog("CONNECTING SCAN TOOL DONGLE: " + device.getAddress());
 
@@ -580,16 +581,13 @@ public class BLEForegroundService extends Service {
 
                 autoConnectDeviceGatt = device.connectGatt(this, false, bluetoothGattCallback);
             }
-        }
-        else
+        } else
             printLog("Device is already in connection : " + device.getAddress() + " " + device.getName());
     }
 
-    private void printLog(String msg)
-    {
-        if(isTesting)
-        {
-             Log.d(TAG, msg);
+    private void printLog(String msg) {
+        if (isTesting) {
+            Log.d(TAG, msg);
         }
     }
 
