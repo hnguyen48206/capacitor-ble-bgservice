@@ -242,7 +242,6 @@ public class BLEForegroundService extends Service {
             }
     }
 
-
     private void permissionListFilter() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
 //            runtimeList = removeString(runtimeList, BLUETOOTH_ADMIN);
