@@ -118,7 +118,6 @@ public class BLEForegroundService extends Service {
                     printLog("Classic BL Device found: " + deviceAddress + "/" + device.getName());
                     findDeviceToConnect(device);
                 }
-
             }
         }
     };
