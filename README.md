@@ -81,7 +81,7 @@ value: {"Vehicle_IsMoving": true}
 
     + Trên một số thiêt bị, có các tuỳ chọn riêng của hãng liên quan đến việc hạn chế hoạt động của các app background. Ví dụ 'Pause App Activity If Unused'. Nên main app cần hướng dẫn người dùng disable tất cả các hạn chế này thủ công trong setting.
 
-    b. iOS <BETA>
+    b. iOS:
         + Từ xcode, kích hoạt quyền background mode từ Capabilities của main app. Chọn 
         Uses Bluetooth LE accessories + Background processing + Act as a BLE accessories + Location Update + Background fetch
         + Trong info.plist, khai báo các key sau:
@@ -102,10 +102,12 @@ value: {"Vehicle_IsMoving": true}
             - Privacy - Location When In Use Usage Description
 
         + Import các files BackgroundTimer.swift và BLEManager.swift vào main App (lưu ý phải dùng tính năng import từ xcode, không phải copy thủ công). Các file này lấy từ git repo của app sample.
-        + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với repo của app sample.
+        + Điều chỉnh APPDelagate.swift của Main App cho phù hợp với APPDelagate.swift của app sample. 
+        Lưu ý merge cả 2 với nhau. Không phải dùng hẳn 1 bên nào. 
         + Sau khi app đã cài trên thiết bị. Bảo đảm app đã được cấp quyền 'Background App Refresh' trong app settings.
 
-4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (Nhánh bleserv cho ANDROID và nhánh bleserv-in-app-gps cho iOS).
+4. Sample app tích hợp: https://github.com/hnguyen48206/capcitor-seven-zip-example-app/tree/bleserv (tham khảo cách sử dụng ở đây). (nhánh bleserv-in-app-gps).
+Lưu ý sử dụng đúng nhánh. 
 
 5. <IOS only> Scan Log History:
 Plugin sẽ lưu lại lịch sử các lần scan thành công vào localstorage của ứng dụng với key "scanHistoryLog"
