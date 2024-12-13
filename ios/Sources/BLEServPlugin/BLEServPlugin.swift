@@ -1,18 +1,10 @@
 import Foundation
 import Capacitor
-import BackgroundTasks
-import CoreBluetooth
-import os.log
 
 @available(iOS 14.0, *)
 @objc(BLEServPlugin)
-public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegate {
-      public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-    
-  }
-  
-    let logger = Logger(subsystem: "com.hnguyen48206.blesrv", category: "background")
-    
+public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin {
+ 
     public let identifier = "BLEServPlugin"
     public let jsName = "BLEServ"
     public let pluginMethods: [CAPPluginMethod] = [
