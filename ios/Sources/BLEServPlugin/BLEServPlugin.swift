@@ -22,12 +22,12 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc public func startService(_ call: CAPPluginCall) {
         print("startService called")
         NotificationCenter.default.post(name: Notification.Name("hnguyen48206_startble"), object: nil)
-        call.resolve()
+        call.resolve(true)
     }
     
     @objc public func stopService(_ call: CAPPluginCall) {
         print("stopService called")
         NotificationCenter.default.post(name: Notification.Name("hnguyen48206_stopble"), object: nil)
-        call.resolve()
+        call.resolve(true)
     }
 }
