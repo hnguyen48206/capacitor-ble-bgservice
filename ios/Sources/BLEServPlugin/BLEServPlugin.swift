@@ -17,18 +17,18 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin {
     
     override public func load() {
         super.load()
-        logger.log("BLEServPlugin loaded")
+        print("BLEServPlugin loaded")
     }
     
     
     @objc public func startService(_ call: CAPPluginCall) {
-        logger.log("startService called")
+        print("startService called")
         NotificationCenter.default.post(name: Notification.Name("hnguyen48206_startble"), object: nil)
         call.resolve()
     }
     
     @objc public func stopService(_ call: CAPPluginCall) {
-        logger.log("stopService called")
+        print("stopService called")
         NotificationCenter.default.post(name: Notification.Name("hnguyen48206_stopble"), object: nil)
         call.resolve()
     }
