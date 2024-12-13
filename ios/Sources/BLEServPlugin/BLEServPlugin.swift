@@ -1,14 +1,40 @@
 import Foundation
 import Capacitor
-import BackgroundTasks
+
 import CoreBluetooth
+import BackgroundTasks
+import UIKit
 import os.log
+import UserNotifications
+import CoreLocation
+
+struct BLEDevice: Codable {
+  let mac: String
+  let deviceName: String
+  let vehicleID: String
+  let status: String
+  let isAutoConnect: Bool
+}
+
+struct BLEConfig: Codable {
+  let scan_period: Int
+  let scan_delay: Int
+  let isTesting: Bool
+  let connect_delay: Int
+}
+
+struct VehicleIsMoving: Codable {
+  let Vehicle_IsMoving: Bool
+}
+enum BluetoothCommand: String, CaseIterable {
+  case numQueue = "NUM_QUEUE\r"
+  case readAll = "READ_ALL\r"
+}
+
 
 @available(iOS 14.0, *)
 @objc(BLEServPlugin)
-public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegate {
-    let logger = Logger(subsystem: "com.hnguyen48206.blesrv", category: "background")
-    
+public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegate, CLLocationManagerDelegate {    
     public let identifier = "BLEServPlugin"
     public let jsName = "BLEServ"
     public let pluginMethods: [CAPPluginMethod] = [
@@ -17,13 +43,34 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegat
     ]
     private let implementation = BLEServ()
     
-    private var centralManager: CBCentralManager!
-    private var knownDeviceId: String?
+    private let locationManager = CLLocationManager()
+    var blSettingStatus: Bool = true
+    var locationSettingAlwaysStatus: Bool = true
+    var centralManager: CBCentralManager!
+    var targetPeripheral: CBPeripheral?
+    let logger: Logger = Logger(subsystem: "com.hnguyen48206.blesrv.ios", category: "background")
+    var count = 0;
+    private lazy var timer = BackgroundTimer(delegate: nil)
+  
+    var MacBluetoothsConnectedStr: String?
+    var BLEConfigsStr: String?
+    var Vehicle_IsMovingStr: String?
+  
+    var listOfSavedDevice = [BLEDevice]()
+    var BLEConfigs = BLEConfig(scan_period:10000, scan_delay:50000, isTesting: true, connect_delay:900000)
+    var Vehicle_IsMoving =  VehicleIsMoving(Vehicle_IsMoving: true)
+    var SCAN_PERIOD: TimeInterval = 10.0
+    var SCAN_DELAY: TimeInterval = 50.0
+    var CONNECT_DELAY: TimeInterval = 900
+    var targetDevice: CBPeripheral?
+    var isFG = true
+    let listOfBLEServ: [CBUUID] = [CBUUID(string: "0x180D"), CBUUID(string: "0x5533")] //HeartRate
+    var listOfLatestSans = [String]()
+    let df = DateFormatter()
+  
     private var detectedDevices: Set<String> = []
-    private let scanPeriod: TimeInterval = 5.0
-    private let delayPeriod: TimeInterval = 10.0
     private var isScanning = false
-    
+
     override public func load() {
         super.load()
         // centralManager = CBCentralManager(delegate: self, queue: nil)
