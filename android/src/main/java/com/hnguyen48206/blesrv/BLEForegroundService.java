@@ -597,7 +597,7 @@ public class BLEForegroundService extends Service {
 
     private void printLog(String msg) {
         if (isTesting) {
-            Log.d(TAG, msg);
+            Log.d(TAG, "[DEBUG] " + msg);
         }
     }
 
