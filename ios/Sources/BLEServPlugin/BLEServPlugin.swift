@@ -36,6 +36,7 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegat
         logger.log("startService called")
         // UserDefaults.standard.set(true, forKey: "serviceRunning")
         // scheduleAppRefresh()
+        NotificationCenter.default.post(name: Notification.Name("hnguyen48206_startble"), object: nil)
         call.resolve()
     }
     
