@@ -127,26 +127,30 @@ public class BLEForegroundService extends Service {
         super.onCreate();
         context = this;
         executorService = Executors.newSingleThreadExecutor();
-        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        reInitLEScanner();
         //classic Bluetooth
         classic_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         createNotificationChannel();
         permissionListFilter();
+    }
 
-        bluetoothAdapter.getProfileProxy(context, new BluetoothProfile.ServiceListener() {
-            @Override
-            public void onServiceConnected(int profile, BluetoothProfile proxy) {
-                printLog("onServiceConnected: " + profile);
-                mProfileProxy = proxy;
-            }
+    private void reInitLEScanner()
+    {
+      BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+      BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+      bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+      bluetoothAdapter.getProfileProxy(context, new BluetoothProfile.ServiceListener() {
+        @Override
+        public void onServiceConnected(int profile, BluetoothProfile proxy) {
+          printLog("onServiceConnected: " + profile);
+          mProfileProxy = proxy;
+        }
 
-            @Override
-            public void onServiceDisconnected(int profile) {
-            }
-        }, BluetoothProfile.GATT);
+        @Override
+        public void onServiceDisconnected(int profile) {
+        }
+      }, BluetoothProfile.GATT);
     }
 
     public void reloadSharePreferences() {
@@ -154,7 +158,8 @@ public class BLEForegroundService extends Service {
         devicelistStr = prefs.getString(DEVICE_LIST_KEY, "");
         bleconfigsStr = prefs.getString(BLE_CONFIG_KEY, "");
         isMovingStr = prefs.getString(IS_MOVING_CONFIG, "");
-        historyList = new ArrayList<>(Arrays.asList(prefs.getString(BLE_SCANLOG_KEY, "").split("devider")));
+        var tmpListStr = prefs.getString(BLE_SCANLOG_KEY, "");
+        historyList = new ArrayList<>(Arrays.asList(tmpListStr.split("devider")));
 
         if (DEBUG) {
             setDebugDefault();
@@ -192,7 +197,7 @@ public class BLEForegroundService extends Service {
 
     private void setDebugDefault() {
         if (devicelistStr.isEmpty())
-            devicelistStr = "[{\"mac\":\"78:02:B7:08:14:51\", \"deviceName\":\"K11\", \"vehicleID\":\"ABC\",\"status\":\"on\",\"isAutoConnect\":true}]";
+            devicelistStr = "[]";
 
         if (bleconfigsStr.isEmpty()) {
             SCAN_PERIOD = 10000;
@@ -357,11 +362,13 @@ public class BLEForegroundService extends Service {
                     reloadSharePreferences();
                     printLog("devicelistStr: " + devicelistStr);
 
-                    if (IS_MOVING || (autoConnectDevice != null && isDeviceConnected(autoConnectDevice))) {
+                    if (listOfDevices.length()>0 && (IS_MOVING || (autoConnectDevice != null && isDeviceConnected(autoConnectDevice)))) {
                         printLog("Starting BLE scan");
                         //current connected devices
                         getCurrentConnectedList();
                         //ble devices
+                        if(bluetoothLeScanner == null)
+                          reInitLEScanner();
                         //bluetoothLeScanner.startScan(scanCallback);
                         bluetoothLeScanner.startScan(filters, scanSettings, scanCallback);
                         //classic devices
@@ -369,7 +376,7 @@ public class BLEForegroundService extends Service {
                         isScanning = true;
                         handler.postDelayed(scanRunnable, SCAN_PERIOD);
                     } else {
-                        var msg = "WONT start BLE scan due to ISMOVING status false or the target device is already in connection.";
+                        var msg = "WONT start BLE scan due to ISMOVING status false OR the target device is already in connection OR listOfDevices is empty";
                         addHistory(msg);
                         printLog(msg);
                     }
@@ -491,7 +498,7 @@ public class BLEForegroundService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSmallIcon(android.R.drawable.ic_menu_search)
                 .setAutoCancel(false)
-                .setOngoing(true)
+                .setOngoing(false)
                 .build();
     }
 
@@ -533,6 +540,11 @@ public class BLEForegroundService extends Service {
         if (historyList.size() > 200)
             historyList.remove(0);
         historyList.add(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + "_" + log_msg);
+
+      SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putString(BLE_SCANLOG_KEY, TextUtils.join("devider", historyList));
+      editor.apply();
     }
 
     private boolean checkActivateStatus() {
