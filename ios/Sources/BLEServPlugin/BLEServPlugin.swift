@@ -37,6 +37,7 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDelegat
     
     @objc public func stopService(_ call: CAPPluginCall) {
         logger.log("stopService called")
+        NotificationCenter.default.post(name: Notification.Name("hnguyen48206_stopble"), object: nil)
         call.resolve()
     }
 }
