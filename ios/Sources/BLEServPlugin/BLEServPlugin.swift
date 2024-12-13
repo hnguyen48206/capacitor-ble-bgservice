@@ -12,9 +12,7 @@ public class BLEServPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stopService", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = BLEServ()
-    
-    private var centralManager: CBCentralManager!
-    
+        
     override public func load() {
         super.load()
         print("BLEServPlugin loaded")
